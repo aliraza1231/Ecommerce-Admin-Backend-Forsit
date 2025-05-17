@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import crud
@@ -10,18 +11,26 @@ router = APIRouter()
 @router.post("/", response_model=schemas.InventoryCreate)
 def add_inventory(inventory: schemas.InventoryCreate, db: Session = Depends(get_db)):
     return crud.create_inventory(db=db, inventory=inventory)
-
-LOW_STOCK_THRESHOLD = 10
+LOW_STOCK_THRESHOLD = 25
 
 @router.get("/low-stock")
 def get_low_stock_items(db: Session = Depends(get_db)):
-    low_stock = (
-        db.query(Product.name, Inventory.quantity)
-        .join(Product)
-        .filter(Inventory.quantity < LOW_STOCK_THRESHOLD)
-        .all()
-    )
-    return {"low_stock_items": low_stock}
+    try:
+        # Fetch products with low stock
+        low_stock = (
+            db.query(Product.name, Inventory.quantity)
+            .join(Inventory, Inventory.product_id == Product.id)
+            .filter(Inventory.quantity < LOW_STOCK_THRESHOLD)
+            .all()
+        )
+        
+        # Convert the result to a list of dictionaries
+        response = [{"product_name": item[0], "quantity": item[1]} for item in low_stock]
+        
+        return {"low_stock_items": response}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/{product_id}")
 def update_inventory(product_id: int, quantity: int, db: Session = Depends(get_db)):
