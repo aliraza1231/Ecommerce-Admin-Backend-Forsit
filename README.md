@@ -57,6 +57,20 @@ Launch the FastAPI server using:
 uvicorn main:app --reload
 ```
 
+## API Endpoints Overview
+| Endpoint            | Method | Description                                                  |
+| ------------------- | ------ | ------------------------------------------------------------ |
+| `/products`         | GET    | Get all products                                             |
+| `/products`         | POST   | Add a new product                                            |
+| `/sales`            | GET    | Retrieve and filter sales data                               |
+| `/sales/revenue`    | GET    | Analyze revenue on a daily, weekly, monthly, or annual basis |
+| `/sales/compare`    | GET    | Compare revenue across different periods and categories      |
+| `/sales`            | POST   | Record a new sale                                            |
+| `/inventory`        | GET    | Get current inventory status                                 |
+| `/inventory/update` | PUT    | Update inventory levels                                      |
+| `/low-stock`        | GET    | Get products with low stock (default threshold: 25)          |
+
+
 Open your browser and navigate to: http://127.0.0.1:8000/docs
 You will find the Swagger UI with all the API endpoints ready for testing.
 
